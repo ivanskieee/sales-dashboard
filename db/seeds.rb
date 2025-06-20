@@ -1,3 +1,11 @@
+# Clear existing data (use cautiously in production)
+DaySale.delete_all
+DiningPreference.delete_all
+MenuCategorySale.delete_all
+MonthlySale.delete_all
+TopMenuItem.delete_all
+
+# Then recreate
 DaySale.create!([
   { day: "Monday", sales: 9000, status: "Open", percent_weekly_sales: 20.45 },
   { day: "Tuesday", sales: 8500, status: "Open", percent_weekly_sales: 19.32 },
