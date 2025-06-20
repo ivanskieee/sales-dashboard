@@ -1,0 +1,2 @@
+class DiningPreference < ApplicationRecord
+end

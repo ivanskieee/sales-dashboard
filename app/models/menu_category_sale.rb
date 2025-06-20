@@ -1,0 +1,2 @@
+class MenuCategorySale < ApplicationRecord
+end

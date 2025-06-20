@@ -1,0 +1,2 @@
+class MonthlySale < ApplicationRecord
+end

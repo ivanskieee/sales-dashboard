@@ -1,0 +1,2 @@
+class DaySale < ApplicationRecord
+end
