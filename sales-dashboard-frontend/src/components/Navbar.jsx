@@ -8,12 +8,18 @@ import {
   Settings, 
   LogOut, 
   Search,
-  ChevronDown
+  ChevronDown,
+  MessageCircle,
+  MapPin,
+  Mail,
+  Phone,
+  Facebook
 } from "lucide-react";
 
 export default function Navbar({ isSidebarOpen, toggleSidebar, isDark, toggleTheme }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isConnectOpen, setIsConnectOpen] = useState(false);
   const [notifications] = useState([
     { id: 1, text: "New project assigned", time: "2m ago", unread: true },
     { id: 2, text: "Team meeting in 30 minutes", time: "15m ago", unread: true },
@@ -21,6 +27,36 @@ export default function Navbar({ isSidebarOpen, toggleSidebar, isDark, toggleThe
   ]);
 
   const unreadCount = notifications.filter(n => n.unread).length;
+
+  const contactDetails = [
+    {
+      icon: MapPin,
+      label: "Address",
+      value: "Stall #1 University Plaza, F. Pimentel Avenue, 4600",
+      type: "text"
+    },
+    {
+      icon: Mail,
+      label: "Email",
+      value: "lhetappetit@gmail.com",
+      type: "email",
+      link: "mailto:lhetappetit@gmail.com"
+    },
+    {
+      icon: Phone,
+      label: "Phone",
+      value: "0967 140 5034",
+      type: "phone",
+      link: "tel:+639671405034"
+    },
+    {
+      icon: Facebook,
+      label: "Facebook",
+      value: "Visit our Facebook page",
+      type: "social",
+      link: "https://www.facebook.com/lhetappetit"
+    }
+  ];
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/20 dark:border-gray-700/20 shadow-lg">
@@ -52,6 +88,82 @@ export default function Navbar({ isSidebarOpen, toggleSidebar, isDark, toggleThe
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
+        {/* Let's Connect Button */}
+        <div className="relative">
+          <button
+            onClick={() => setIsConnectOpen(!isConnectOpen)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-sm font-medium hidden sm:block">Let's Connect</span>
+          </button>
+
+          {/* Connect Dropdown */}
+          {isConnectOpen && (
+            <div className="absolute right-0 mt-2 w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-3 z-50 animate-in slide-in-from-top-2 duration-200">
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5 text-green-500" />
+                  Get in Touch
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  We'd love to hear from you!
+                </p>
+              </div>
+              
+              <div className="px-2 py-2 space-y-1">
+                {contactDetails.map((contact, index) => {
+                  const IconComponent = contact.icon;
+                  const isClickable = contact.link;
+                  
+                  const content = (
+                    <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-all duration-200 group">
+                      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                        <IconComponent className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                          {contact.label}
+                        </p>
+                        <p className="text-sm text-gray-800 dark:text-gray-200 mt-1 break-words">
+                          {contact.value}
+                        </p>
+                      </div>
+                      {isClickable && (
+                        <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <ChevronDown className="w-4 h-4 text-gray-400 rotate-[-90deg]" />
+                        </div>
+                      )}
+                    </div>
+                  );
+
+                  return isClickable ? (
+                    <a
+                      key={index}
+                      href={contact.link}
+                      target={contact.type === 'social' ? '_blank' : '_self'}
+                      rel={contact.type === 'social' ? 'noopener noreferrer' : undefined}
+                      className="block cursor-pointer"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div key={index} className="cursor-default">
+                      {content}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2">
+                <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                  Click on email, phone, or social links to connect instantly
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
@@ -111,7 +223,7 @@ export default function Navbar({ isSidebarOpen, toggleSidebar, isDark, toggleThe
               <User className="w-4 h-4 text-white" />
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-gray-800 dark:text-white">First Client</p>
+              <p className="text-sm font-medium text-gray-800 dark:text-white">Lhet Appetitt</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">Admin</p>
             </div>
             <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -121,8 +233,8 @@ export default function Navbar({ isSidebarOpen, toggleSidebar, isDark, toggleThe
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-2 z-50">
               <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <p className="font-medium text-gray-800 dark:text-white">First Client</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">first.client@company.com</p>
+                <p className="font-medium text-gray-800 dark:text-white">Lhet Appetitt</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">lhetappetit@gmail.com</p>
               </div>
               
               <button className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-3">

@@ -30,7 +30,7 @@ export default function Sidebar({ isOpen, toggleSidebar, currentPage, isDark, to
           <div className="flex items-center gap-3">
             <div className="relative group">
               <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25 transition-all duration-300 group-hover:shadow-purple-500/40 group-hover:scale-105">
-                <span className="text-white font-bold text-lg tracking-tight">D</span>
+                <span className="text-white font-bold text-lg tracking-tight">L</span>
               </div>
               <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-xl opacity-20 blur-sm -z-10 group-hover:opacity-30 transition-opacity duration-300"></div>
             </div>
