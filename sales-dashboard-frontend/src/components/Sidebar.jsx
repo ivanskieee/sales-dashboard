@@ -3,7 +3,6 @@ import {
   BarChart3,
   MessageCircle,
   Settings,
-  LogOut,
   ChevronsLeft,
   ChevronsRight,
   Sun,
@@ -22,67 +21,75 @@ export default function Sidebar({ isOpen, toggleSidebar, currentPage, isDark, to
     <aside
       className={`${
         isOpen ? "w-64" : "w-20"
-      } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-screen transition-all duration-300 ease-in-out flex flex-col justify-between shadow-lg`}
+      } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-screen transition-all duration-500 ease-out flex flex-col justify-between shadow-lg`}
     >
-      {/* Logo + Toggle */}
-      <div className="p-4">
+      {/* Header Section */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
+          {/* Logo & Title */}
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <div className="w-10 h-10 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25 transition-all duration-300 group-hover:shadow-purple-500/40 group-hover:scale-105">
+                <span className="text-white font-bold text-lg tracking-tight">D</span>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-xl opacity-20 blur-sm -z-10 group-hover:opacity-30 transition-opacity duration-300"></div>
             </div>
-            <h1 className={`text-xl font-bold text-gray-900 dark:text-white ${!isOpen && "hidden"}`}>
-              Admin
-            </h1>
+            
+            <div className={`overflow-hidden transition-all duration-500 ease-out ${
+              isOpen ? 'max-w-xs opacity-100' : 'max-w-0 opacity-0'
+            }`}>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent whitespace-nowrap">
+                Admin
+              </h1>
+            </div>
           </div>
-          <button 
-            onClick={toggleSidebar}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-          >
-            {isOpen ? (
-              <ChevronsLeft className="w-5 h-5" />
-            ) : (
-              <ChevronsRight className="w-5 h-5" />
-            )}
-          </button>
+          
+          {/* Toggle Button */}
         </div>
       </div>
 
       {/* Nav Items */}
-      <ul className="flex-1 space-y-2 px-3">
+      <ul className="flex-1 space-y-2 px-4 py-6">
         {navItems.map(({ label, icon }) => {
           const isActive = label === currentPage;
           return (
             <li
               key={label}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 ease-out group ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 transform scale-[1.02]"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:scale-[1.01]"
               }`}
             >
-              {icon}
-              {isOpen && <span className="text-sm font-medium">{label}</span>}
+              <div className="flex-shrink-0">
+                {icon}
+              </div>
+              <div className={`overflow-hidden transition-all duration-500 ease-out ${
+                isOpen ? 'max-w-xs opacity-100' : 'max-w-0 opacity-0'
+              }`}>
+                <span className="text-sm font-medium whitespace-nowrap">{label}</span>
+              </div>
             </li>
           );
         })}
       </ul>
 
-      {/* Theme Toggle & Logout */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
-        {/* Theme Toggle */}
+      {/* Theme Toggle */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <div 
-          className="flex items-center gap-3 cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+          className="flex items-center gap-3 cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 ease-out hover:scale-[1.01] group"
           onClick={toggleTheme}
         >
-          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          {isOpen && <span className="text-sm">{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
-        </div>
-        
-        {/* Logout */}
-        <div className="flex items-center gap-3 cursor-pointer text-red-500 hover:text-red-600 px-4 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200">
-          <LogOut className="w-5 h-5" />
-          {isOpen && <span className="text-sm">Sign out</span>}
+          <div className="flex-shrink-0">
+            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </div>
+          <div className={`overflow-hidden transition-all duration-500 ease-out ${
+            isOpen ? 'max-w-xs opacity-100' : 'max-w-0 opacity-0'
+          }`}>
+            <span className="text-sm font-medium whitespace-nowrap">
+              {isDark ? 'Light Mode' : 'Dark Mode'}
+            </span>
+          </div>
         </div>
       </div>
     </aside>

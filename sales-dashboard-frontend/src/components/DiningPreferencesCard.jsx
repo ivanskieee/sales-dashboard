@@ -4,7 +4,6 @@ import { Users, TrendingUp, Heart, BarChart3 } from "lucide-react";
 
 export default function DiningPreferencesCard() {
   const [data, setData] = useState([]);
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'chart'
   const { isDark } = useTheme();
 
   useEffect(() => {
@@ -13,9 +12,6 @@ export default function DiningPreferencesCard() {
       .then(setData)
       .catch(console.error);
   }, []);
-
-  // Calculate max percentage for chart visualization
-  const maxPercentage = Math.max(...data.map(item => parseFloat(item.percentage) || 0));
 
   const getPreferenceIcon = (preference) => {
     const pref = preference.toLowerCase();
@@ -26,177 +22,165 @@ export default function DiningPreferencesCard() {
 
   const getPreferenceColor = (index) => {
     const colors = [
-      'from-blue-500 to-purple-600',
-      'from-green-500 to-teal-500',
-      'from-pink-500 to-rose-500',
-      'from-yellow-500 to-orange-500',
-      'from-indigo-500 to-blue-500',
-      'from-purple-500 to-pink-500'
+      '#3B82F6', // Blue
+      '#10B981', // Green
+      '#F59E0B', // Amber
+      '#EF4444', // Red
+      '#8B5CF6', // Purple
+      '#F97316', // Orange
+      '#06B6D4', // Cyan
+      '#84CC16', // Lime
     ];
     return colors[index % colors.length];
   };
 
-  return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
-      {/* Compact Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
-            <Users className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Dining Preferences
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Customer insights
-            </p>
-          </div>
-        </div>
+  // Calculate total for percentages
+  const total = data.reduce((sum, item) => sum + parseFloat(item.percentage || 0), 0);
+  
+  // Create circle chart data
+  let cumulativePercentage = 0;
+  const chartData = data.map((item, index) => {
+    const percentage = parseFloat(item.percentage || 0);
+    const startAngle = (cumulativePercentage / 100) * 360;
+    const endAngle = ((cumulativePercentage + percentage) / 100) * 360;
+    cumulativePercentage += percentage;
+    
+    return {
+      ...item,
+      percentage,
+      startAngle,
+      endAngle,
+      color: getPreferenceColor(index)
+    };
+  });
 
-        {/* Compact View Toggle */}
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-0.5">
-          <button
-            onClick={() => setViewMode('table')}
-            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-              viewMode === 'table'
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-            }`}
-          >
-            Table
-          </button>
-          <button
-            onClick={() => setViewMode('chart')}
-            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-              viewMode === 'chart'
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-            }`}
-          >
-            Chart
-          </button>
+  const createPath = (centerX, centerY, radius, startAngle, endAngle, innerRadius = 0) => {
+    const start = polarToCartesian(centerX, centerY, radius, endAngle);
+    const end = polarToCartesian(centerX, centerY, radius, startAngle);
+    const innerStart = polarToCartesian(centerX, centerY, innerRadius, endAngle);
+    const innerEnd = polarToCartesian(centerX, centerY, innerRadius, startAngle);
+    
+    const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+    
+    return [
+      "M", start.x, start.y,
+      "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+      "L", innerEnd.x, innerEnd.y,
+      "A", innerRadius, innerRadius, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
+      "Z"
+    ].join(" ");
+  };
+
+  const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+    return {
+      x: centerX + (radius * Math.cos(angleInRadians)),
+      y: centerY + (radius * Math.sin(angleInRadians))
+    };
+  };
+
+  const centerX = 100;
+  const centerY = 100;
+  const outerRadius = 80;
+  const innerRadius = 50;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+          <Users className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            Dining Preferences
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Customer insights overview
+          </p>
         </div>
       </div>
 
-      {viewMode === 'table' ? (
-        /* Compact Table View */
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left py-2 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Preference
-                </th>
-                <th className="text-left py-2 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Count
-                </th>
-                <th className="text-left py-2 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Share
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, index) => (
-                <tr 
-                  key={row.id} 
-                  className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                >
-                  <td className="py-2 px-2">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-5 h-5 bg-gradient-to-r ${getPreferenceColor(index)} rounded flex items-center justify-center`}>
-                        {getPreferenceIcon(row.preference)}
-                      </div>
-                      <span className="font-medium text-gray-900 dark:text-white text-xs truncate">
-                        {row.preference.length > 15 ? row.preference.substring(0, 15) + '...' : row.preference}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-2 px-2">
-                    <span className="font-semibold text-gray-900 dark:text-white text-xs">
-                      {row.customer_count_range}
-                    </span>
-                  </td>
-                  <td className="py-2 px-2">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-medium text-gray-900 dark:text-white">
-                        {row.percentage}
-                      </span>
-                      <div className="w-8 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full bg-gradient-to-r ${getPreferenceColor(index)} rounded-full transition-all duration-500`}
-                          style={{ width: `${(parseFloat(row.percentage) / maxPercentage) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="flex flex-col lg:flex-row items-center gap-6">
+        {/* Circle Chart */}
+        <div className="relative flex-shrink-0">
+          <svg width="200" height="200" viewBox="0 0 200 200" className="transform -rotate-90">
+            {chartData.map((item, index) => (
+              <g key={item.id || index}>
+                <path
+                  d={createPath(centerX, centerY, outerRadius, item.startAngle, item.endAngle, innerRadius)}
+                  fill={item.color}
+                  className="hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+                  stroke="white"
+                  strokeWidth="2"
+                />
+              </g>
+            ))}
+          </svg>
+          
+          {/* Center Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {data.length}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Categories
+            </div>
+          </div>
         </div>
-      ) : (
-        /* Compact Chart View */
-        <div className="space-y-2">
-          {data.map((row, index) => (
-            <div 
-              key={row.id} 
-              className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200"
-            >
-              <div className="flex items-center gap-3 flex-1">
-                <div className={`w-6 h-6 bg-gradient-to-r ${getPreferenceColor(index)} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                  {getPreferenceIcon(row.preference)}
+
+        {/* Legend */}
+        <div className="flex-1 space-y-3">
+          {chartData.map((item, index) => (
+            <div key={item.id || index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-4 h-4 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: item.color }}
+                ></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                    {getPreferenceIcon(item.preference)}
+                  </div>
+                  <span className="font-medium text-gray-900 dark:text-white text-sm">
+                    {item.preference}
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                      {row.preference.length > 20 ? row.preference.substring(0, 20) + '...' : row.preference}
-                    </span>
-                    <span className="text-xs font-semibold text-gray-900 dark:text-white">
-                      {row.percentage}
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full bg-gradient-to-r ${getPreferenceColor(index)} rounded-full transition-all duration-700 ease-out`}
-                      style={{ 
-                        width: `${(parseFloat(row.percentage) / maxPercentage) * 100}%`,
-                        animationDelay: `${index * 100}ms`
-                      }}
-                    ></div>
-                  </div>
+              </div>
+              <div className="text-right">
+                <div className="font-semibold text-gray-900 dark:text-white">
+                  {item.percentage.toFixed(1)}%
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {item.customer_count_range}
                 </div>
               </div>
             </div>
           ))}
-          
-          {/* Compact Summary Stats */}
-          <div className="mt-3 grid grid-cols-3 gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            <div className="text-center">
-              <p className="text-sm font-bold text-gray-900 dark:text-white">
-                {data.length}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-bold text-green-500">
-                {data.length > 0 ? Math.max(...data.map(item => parseFloat(item.percentage) || 0)).toFixed(1) : 0}%
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Top</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-bold text-blue-500">
-                {data.reduce((sum, item) => {
-                  const range = item.customer_count_range;
-                  const match = range.match(/(\d+)-(\d+)/);
-                  return sum + (match ? Math.floor((parseInt(match[1]) + parseInt(match[2])) / 2) : 0);
-                }, 0)}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Avg</p>
-            </div>
-          </div>
         </div>
-      )}
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="text-center">
+          <p className="text-xl font-bold text-gray-900 dark:text-white">
+            {data.length}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Total Categories</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xl font-bold text-green-500">
+            {data.length > 0 ? Math.max(...data.map(item => parseFloat(item.percentage) || 0)).toFixed(1) : 0}%
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Highest Share</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xl font-bold text-blue-500">
+            {data.length > 0 ? (total / data.length).toFixed(1) : 0}%
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Average</p>
+        </div>
+      </div>
     </div>
   );
 }

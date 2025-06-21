@@ -3,8 +3,8 @@ import { ChefHat, TrendingUp, TrendingDown, Pizza, Coffee, Utensils, BarChart3, 
 
 export default function MenuCategoryCard() {
   const [data, setData] = useState([]);
-  const [viewMode, setViewMode] = useState("table"); // 'table', 'bar', 'donut', 'grid'
-  const isDark = false; // You can connect this to your theme context
+  const [viewMode, setViewMode] = useState("grid"); 
+  const isDark = false; 
 
   useEffect(() => {
     fetch("http://localhost:3000/api/menu_category_sales")
@@ -54,10 +54,10 @@ export default function MenuCategoryCard() {
   };
 
   const viewOptions = [
+    { key: "grid", label: "Grid", icon: <Grid3x3 className="w-3 h-3" /> },
     { key: "table", label: "Table", icon: <Table className="w-3 h-3" /> },
     { key: "bar", label: "Bar", icon: <BarChart3 className="w-3 h-3" /> },
-    { key: "donut", label: "Donut", icon: <PieChart className="w-3 h-3" /> },
-    { key: "grid", label: "Grid", icon: <Grid3x3 className="w-3 h-3" /> }
+    { key: "donut", label: "Donut", icon: <PieChart className="w-3 h-3" /> }
   ];
 
   const renderTableView = () => (
@@ -242,32 +242,34 @@ export default function MenuCategoryCard() {
   };
 
   const renderGridView = () => (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-4">
       {data.map((row, index) => (
         <div
           key={row.id}
-          className={`relative p-3 rounded-xl bg-gradient-to-br ${getCategoryColor(index)} text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
+          className={`relative p-4 rounded-xl bg-gradient-to-br ${getCategoryColor(index)} text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
         >
-          <div className="absolute top-2 right-2 opacity-20">
-            {getCategoryIcon(row.category)}
+          <div className="absolute top-3 right-3 opacity-20">
+            <div className="w-8 h-8 flex items-center justify-center">
+              {getCategoryIcon(row.category)}
+            </div>
           </div>
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
                 {getCategoryIcon(row.category)}
               </div>
-              <h4 className="text-xs font-semibold truncate">
-                {row.category.length > 10 ? row.category.substring(0, 10) + '...' : row.category}
+              <h4 className="text-sm font-semibold truncate">
+                {row.category.length > 12 ? row.category.substring(0, 12) + '...' : row.category}
               </h4>
             </div>
-            <div className="space-y-1">
-              <div className="text-sm font-bold">₱{row.sales.toLocaleString()}</div>
+            <div className="space-y-2">
+              <div className="text-lg font-bold">₱{row.sales.toLocaleString()}</div>
               <div className="flex items-center justify-between">
-                <span className="text-xs opacity-90">{row.sales_percentage}% share</span>
+                <span className="text-sm opacity-90">{row.sales_percentage}% share</span>
                 {row.sales > totalSales / data.length ? (
-                  <TrendingUp className="w-3 h-3" />
+                  <TrendingUp className="w-4 h-4" />
                 ) : (
-                  <TrendingDown className="w-3 h-3" />
+                  <TrendingDown className="w-4 h-4" />
                 )}
               </div>
             </div>
@@ -279,21 +281,21 @@ export default function MenuCategoryCard() {
 
   const renderView = () => {
     switch (viewMode) {
+      case "grid": return renderGridView();
       case "table": return renderTableView();
       case "bar": return renderBarChart();
       case "donut": return renderDonutChart();
-      case "grid": return renderGridView();
-      default: return renderTableView();
+      default: return renderGridView();
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-            <ChefHat className="w-4 h-4 text-white" />
+            <ChefHat className="w-5 h-5 text-white" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Menu Categories</h3>
@@ -307,7 +309,7 @@ export default function MenuCategoryCard() {
             <button
               key={option.key}
               onClick={() => setViewMode(option.key)}
-              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                 viewMode === option.key
                   ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -321,28 +323,28 @@ export default function MenuCategoryCard() {
       </div>
 
       {/* Content */}
-      <div className="min-h-[200px]">
+      <div>
         {renderView()}
       </div>
 
-      {/* Summary Stats */}
-      {viewMode !== "donut" && (
-        <div className="mt-4 grid grid-cols-3 gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <p className="text-sm font-bold text-gray-900 dark:text-white">₱{totalSales.toLocaleString()}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Total Sales</p>
+      {/* Summary Stats - Only show for non-grid views */}
+      {viewMode !== "grid" && viewMode !== "donut" && (
+        <div className="mt-6 grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <p className="text-lg font-bold text-gray-900 dark:text-white">₱{totalSales.toLocaleString()}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Total Sales</p>
           </div>
-          <div className="text-center p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-            <p className="text-sm font-bold text-orange-600 dark:text-orange-400">
+          <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               ₱{data.length > 0 ? ((totalSales / data.length) / 1000).toFixed(0) : 0}k
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Average</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Average</p>
           </div>
-          <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <p className="text-sm font-bold text-green-600 dark:text-green-400">
+          <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <p className="text-lg font-bold text-green-600 dark:text-green-400">
               {data.length > 0 ? Math.max(...data.map(item => parseFloat(item.sales_percentage))).toFixed(1) : 0}%
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Top Share</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Top Share</p>
           </div>
         </div>
       )}
