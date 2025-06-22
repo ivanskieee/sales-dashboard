@@ -14,7 +14,6 @@ export default function DaySalesCard() {
       .catch(console.error);
   }, []);
 
-  // Calculate max sales for chart visualization
   const maxSales = Math.max(...data.map((item) => item.sales));
 
   const getStatusColor = (status) => {

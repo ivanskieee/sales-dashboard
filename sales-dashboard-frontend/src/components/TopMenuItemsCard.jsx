@@ -14,7 +14,6 @@ export default function TopMenuItemsCard() {
       .catch(console.error);
   }, []);
 
-  // Calculate max orders for chart visualization
   const maxOrders = Math.max(...items.map((item) => item.orders));
   const totalOrders = items.reduce((sum, item) => sum + item.orders, 0);
 
