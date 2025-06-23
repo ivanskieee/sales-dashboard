@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown, Circle, BarChart3 } from "lucide-react";
 
 export default function DaySalesCard() {
   const [data, setData] = useState([]);
-  const [viewMode, setViewMode] = useState("table"); // 'table' or 'chart'
+  const [viewMode, setViewMode] = useState("table");
   const { isDark } = useTheme();
 
   useEffect(() => {
